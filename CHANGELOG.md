@@ -28,6 +28,7 @@
 * today Zend completely renamed Optimizer+ to OPcache, adjusted OCP to keep working
 
 0.1.0 / 2013-03-17
+==================
 * added group/sort indicators, replaced "accelerator_" functions with "opcache_"
 
 0.0.6 / 2013-03-16
