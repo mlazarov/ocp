@@ -15,5 +15,5 @@ Unlike APC, the Zend OPcache API
 
 
 ## Based on OCP 
-Opcache Control Panel from _ck_ (with contributions by GK, stasilok)
-Original source: Based on OCP - Opcache Control Panel from _ck_ (with contributions by GK, stasilok)
+* Opcache Control Panel from _ck_ (with contributions by GK, stasilok)
+* Original source: Based on OCP - Opcache Control Panel from _ck_ (with contributions by GK, stasilok)
