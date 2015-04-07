@@ -4,11 +4,12 @@
 
 ### Usage
 
-Download ocp.php and point your browser to the file.
+Download ocp.php to your webroot and point your browser to the file.
 
 
 ### Known problems/Limitations:
-Unlike APC, the Zend OPcache API
+
+Unlike APC, the Zend OPcache API:
  - cannot determine when a file was put into the cache
  - cannot change settings on the fly
  - cannot protect opcache functions by restricting execution to only specific scripts/paths
