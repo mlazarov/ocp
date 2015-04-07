@@ -1,5 +1,6 @@
 # OCP - Opcache Control Panel
 
+![OCP](https://raw.githubusercontent.com/mlazarov/ocp/master/screenshot-01.png)
 
 ### Known problems/Limitations:
 Unlike APC, the Zend OPcache API
