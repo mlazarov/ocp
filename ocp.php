@@ -1,13 +1,13 @@
 <?php
 /*
  * OCP - Opcache Control Panel
- * Author: Martin Lazarov <martin@lazarov.bg>
  * Original Author: _ck_   (with contributions by GK, stasilok)
- * Version: 0.1.6
+ * Version: 0.2.0
 */
 
 // ini_set('display_errors',1); error_reporting(-1);
-if ( count(get_included_files())>1 || php_sapi_name()=='cli' || empty($_SERVER['REMOTE_ADDR']) ) { die; }  // weak block against indirect access
+
+if ( count(get_included_files())>1 || php_sapi_name()=='cli' || empty($_SERVER['REMOTE_ADDR']) ) { die('Indirect access not allowed'); }  // weak block against indirect access
 
 $time=time();
 define('CACHEPREFIX',function_exists('opcache_reset')?'opcache_':(function_exists('accelerator_reset')?'accelerator_':''));
@@ -33,16 +33,18 @@ if ( !empty($_GET['RECHECK']) ) {
 
 topheader();
 
-if ( !function_exists(CACHEPREFIX.'get_status') ) { echo '<h2>Opcache not detected?</h2>'; die; }
+if ( !function_exists(CACHEPREFIX.'get_status') ) { echo '<h2>Opcache not detected?</h2>'; exit; }
 
 if ( !empty($_GET['FILES']) ) { echo '<h2>files cached</h2>'; files_display(); echo '</div></body></html>'; exit; }
 
 if ( !(isset($_REQUEST['GRAPHS']) && !$_REQUEST['GRAPHS']) && CACHEPREFIX=='opcache_') { graphs_display(); if ( !empty($_REQUEST['GRAPHS']) ) { exit; } }
 
+// some info is only available via phpinfo? sadly buffering capture has to be used
 ob_start();
 phpinfo(8);
 $phpinfo = ob_get_contents();
-ob_end_clean(); 		 // some info is only available via phpinfo? sadly buffering capture has to be used
+ob_end_clean();
+
 if ( !preg_match( '/module\_Zend (Optimizer\+|OPcache).+?(\<table[^>]*\>.+?\<\/table\>).+?(\<table[^>]*\>.+?\<\/table\>)/s', $phpinfo, $opcache) ) { }  // todo
 
 if ( function_exists(CACHEPREFIX.'get_configuration') ) { echo '<h2>general</h2>'; $configuration=call_user_func(CACHEPREFIX.'get_configuration'); }
@@ -80,7 +82,8 @@ if ( !empty($configuration['blacklist']) ) { echo '<h2 id="blacklist">blacklist<
 
 if ( !empty($opcache[3]) ) { echo '<h2 id="runtime">runtime</h2>'; echo $opcache[3]; }
 
-$name='zend opcache'; $functions=get_extension_funcs($name); 
+$name='zend opcache';
+$functions=get_extension_funcs($name); 
 if (!$functions) { $name='zend optimizer+'; $functions=get_extension_funcs($name); }
 if ($functions) { echo '<h2 id="functions">functions</h2>'; print_table($functions);  } else { $name=''; }
 
@@ -89,13 +92,13 @@ if (isset($configuration['directives'][$level])) {
 	echo '<h2 id="optimization">optimization levels</h2>';		
 	$levelset=strrev(base_convert($configuration['directives'][$level], 10, 2));
 	$levels=array(
-    	1=>'<a href="http://wikipedia.org/wiki/Common_subexpression_elimination">Constants subexpressions elimination</a> (CSE) true, false, null, etc.<br />Optimize series of ADD_STRING / ADD_CHAR<br />Convert CAST(IS_BOOL,x) into BOOL(x)<br />Convert <a href="http://www.php.net/manual/internals2.opcodes.init-fcall-by-name.php">INIT_FCALL_BY_NAME</a> + <a href="http://www.php.net/manual/internals2.opcodes.do-fcall-by-name.php">DO_FCALL_BY_NAME</a> into <a href="http://www.php.net/manual/internals2.opcodes.do-fcall.php">DO_FCALL</a>',
-    	2=>'Convert constant operands to expected types<br />Convert conditional <a href="http://php.net/manual/internals2.opcodes.jmp.php">JMP</a>  with constant operands<br />Optimize static <a href="http://php.net/manual/internals2.opcodes.brk.php">BRK</a> and <a href="<a href="http://php.net/manual/internals2.opcodes.cont.php">CONT</a>',
-    	3=>'Convert $a = $a + expr into $a += expr<br />Convert $a++ into ++$a<br />Optimize series of <a href="http://php.net/manual/internals2.opcodes.jmp.php">JMP</a>',
-    	4=>'PRINT and ECHO optimization (<a href="https://github.com/zend-dev/ZendOptimizerPlus/issues/73">defunct</a>)',
-	5=>'Block Optimization - most expensive pass<br />Performs many different optimization patterns based on <a href="http://wikipedia.org/wiki/Control_flow_graph">control flow graph</a> (CFG)',
-	9=>'Optimize <a href="http://wikipedia.org/wiki/Register_allocation">register allocation</a> (allows re-usage of temporary variables)',
-	10=>'Remove NOPs'
+		1=>'<a href="http://wikipedia.org/wiki/Common_subexpression_elimination">Constants subexpressions elimination</a> (CSE) true, false, null, etc.<br />Optimize series of ADD_STRING / ADD_CHAR<br />Convert CAST(IS_BOOL,x) into BOOL(x)<br />Convert <a href="http://www.php.net/manual/internals2.opcodes.init-fcall-by-name.php">INIT_FCALL_BY_NAME</a> + <a href="http://www.php.net/manual/internals2.opcodes.do-fcall-by-name.php">DO_FCALL_BY_NAME</a> into <a href="http://www.php.net/manual/internals2.opcodes.do-fcall.php">DO_FCALL</a>',
+		2=>'Convert constant operands to expected types<br />Convert conditional <a href="http://php.net/manual/internals2.opcodes.jmp.php">JMP</a>  with constant operands<br />Optimize static <a href="http://php.net/manual/internals2.opcodes.brk.php">BRK</a> and <a href="<a href="http://php.net/manual/internals2.opcodes.cont.php">CONT</a>',
+		3=>'Convert $a = $a + expr into $a += expr<br />Convert $a++ into ++$a<br />Optimize series of <a href="http://php.net/manual/internals2.opcodes.jmp.php">JMP</a>',
+		4=>'PRINT and ECHO optimization (<a href="https://github.com/zend-dev/ZendOptimizerPlus/issues/73">defunct</a>)',
+		5=>'Block Optimization - most expensive pass<br />Performs many different optimization patterns based on <a href="http://wikipedia.org/wiki/Control_flow_graph">control flow graph</a> (CFG)',
+		9=>'Optimize <a href="http://wikipedia.org/wiki/Register_allocation">register allocation</a> (allows re-usage of temporary variables)',
+		10=>'Remove NOPs'
 	);
 	echo '<table width="600" border="0" cellpadding="3"><tbody><tr class="h"><th>Pass</th><th>Description</th></tr>';
 	foreach ($levels as $pass=>$description) {
@@ -116,6 +119,9 @@ meta_display();
 echo '</div></body></html>';
 
 exit;
+
+####################
+### Functions ######
 
 function time_since($time,$original,$extended=0,$text='ago') {	
 	$time =  $time - $original; 
@@ -177,18 +183,12 @@ function files_display() {
 	$group=empty($_GET['GROUP'])?0:intval($_GET['GROUP']); if ( $group<0 || $group>9) { $group=1;}
 	$groupset=array_fill(0,9,''); $groupset[$group]=' class="b" ';
 	
-	echo '<div class="meta">	
-		<a ',$groupset[0],'href="',$nogroup,'">ungroup</a> | 
-		<a ',$groupset[1],'href="',$nogroup,'&GROUP=1">1</a> | 
-		<a ',$groupset[2],'href="',$nogroup,'&GROUP=2">2</a> | 
-		<a ',$groupset[3],'href="',$nogroup,'&GROUP=3">3</a> | 
-		<a ',$groupset[4],'href="',$nogroup,'&GROUP=4">4</a> | 
-		<a ',$groupset[5],'href="',$nogroup,'&GROUP=5">5</a> |
-		<a ',$groupset[6],'href="',$nogroup,'&GROUP=4">6</a> | 
-		<a ',$groupset[7],'href="',$nogroup,'&GROUP=4">7</a> | 
-		<a ',$groupset[8],'href="',$nogroup,'&GROUP=4">8</a>
-		
-	</div>';
+	echo '<div class="meta">';
+	echo '<a '.$groupset[0].'href="'.$nogroup.'">ungroup</a> | ';
+	for($i=1;$i<10;$i++){
+		echo '<a '.$groupset[$i].'href="'.$nogroup.'&GROUP='.$i.'">'.$i.'</a> | ';
+	}
+	echo '</div>';
 		
 	if ( !$group ) { $files =& $status['scripts']; }
 	else {		
