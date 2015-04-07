@@ -2,6 +2,11 @@
 
 ![OCP](https://raw.githubusercontent.com/mlazarov/ocp/master/screenshot-01.png)
 
+### Usage
+
+Download ocp.php and point your browser to the file.
+
+
 ### Known problems/Limitations:
 Unlike APC, the Zend OPcache API
  - cannot determine when a file was put into the cache
