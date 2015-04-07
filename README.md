@@ -4,6 +4,7 @@
 
 ### Changelog
 
+
 0.1.6  2013-04-12  moved meta to footer so graphs can be higher and reduce clutter
 0.1.5  2013-04-12  added graphs to visualize cache state, please report any browser/style bugs
 0.1.4  2013-04-09  added "recheck" to update files when using large revalidate_freq (or validate_timestamps=Off)
@@ -22,10 +23,12 @@ Unlike APC, the Zend OPcache API
  - cannot change settings on the fly
  - cannot protect opcache functions by restricting execution to only specific scripts/paths
 
-### todo:
-Extract variables for prefered ordering and better layout instead of just dumping into tables
-File list filter
+### Todo:
+- Extract variables for prefered ordering and better layout instead of just dumping into tables
+- File list filter
 
 
 
-#### Based on OCP - Opcache Control Panel from _ck_ (with contributions by GK, stasilok)
+## Based on OCP 
+Opcache Control Panel from _ck_ (with contributions by GK, stasilok)
+Original source: Based on OCP - Opcache Control Panel from _ck_ (with contributions by GK, stasilok)
